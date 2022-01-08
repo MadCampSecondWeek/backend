@@ -7,12 +7,9 @@ const Posts = require('../models/post');
 
 
 
-const commentSchema = new mongoose.Schema({
-    content :{
-        type : String,
-        required : true,
-    },
-    author:{
+const likePostSchema = new mongoose.Schema({
+
+    user:{
         type : mongoose.Types.ObjectId,
         ref:"users",
         required : true
@@ -23,17 +20,13 @@ const commentSchema = new mongoose.Schema({
         ref : "posts",
         required : true        
     },
-    likeCount :{
-        type : Number,
-        required: true,
-        default : 0.
-    },
 },
     {
         timestamps:true,
-        collection:'comments'
+        versionKey: false,
+        collection:'likepost'
 });
 
 
-const Comments = mongoose.model('comments',commentSchema);
-module.exports = Comments
+const LikePost = mongoose.model('likepost',likePostSchema);
+module.exports = LikePost

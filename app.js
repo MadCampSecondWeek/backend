@@ -6,11 +6,22 @@ const nodemon = require('nodemon');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const express = require('express');
+
 require('dotenv').config
-const app = express();
 
 require('./db');
-// require('./models/post');
+require('./models/post');
+require('./models/user');
+require('./models/comment');
+const router = require('./routers/main');
+const postRouter = require('./routers/postRouter');
+const userRouter = require('./routers/userRouter');
+const commentRouter = require('./routers/commentRouter');
+const boardRouter = require('./routers/boardRouter');
+
+const app = express();
+
+
 
 app.use(morgan('dev'));
 
@@ -22,17 +33,17 @@ app.use(session({
     resave:false,
     saveUninitialized:true
 }));
-const router = require('./routers/main');
-const postRouter = require('./routers/postRouter');
+
 
 const PORT = process.env.PORT||80;
 
 
 const post = require('./models/post');
-app.use('/',router);
+
+app.use('/',boardRouter);
 app.use('/board',postRouter);
-
-
+app.use('/user',userRouter);
+app.use('/board/comment',commentRouter);
 
 
 

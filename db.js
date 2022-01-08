@@ -27,4 +27,4 @@ const handleError = (err)=>{
 db1.once('open',handleConnection);
 db1.on('error',handleError);
 
-// module.exports =  db1
+module.exports =  db1
