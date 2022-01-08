@@ -22,7 +22,9 @@ const commentWriteRouter = async (req,res) =>{
 //     }
         /* userid, postid */
         if (!queryOk([req.query.userid,req.query.postid])){
-            res.status(400).send({errorCode:400,error:"no appropriate query request"});
+            const result = {errorCode:400,error:"no appropriate query request"}
+            console.log(result);
+            res.status(400).send(result);
         }else{
             const result = await commentController.commentWrite(req.query.userid,req.query.postid);
 
@@ -41,7 +43,9 @@ const commentWriteRouter = async (req,res) =>{
 const deleteOneCommentRouter = async (req,res)=>{
     const commentid = req.query.commentid
     if (!queryOk([commentid,req.query.userid])){
-        res.status(400).send({errorCode:400,error:"no appropriate query request"});
+        const result = {errorCode:400,error:"no appropriate query request"}
+        console.log(result);
+        res.status(400).send(result);
     }else{
         const result = await commentController.deleteOneComment(commentid,req.query.userid)
         if (result.hasOwnProperty("error")){

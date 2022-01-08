@@ -9,10 +9,13 @@ const queryOk = require('../public/queryOk');
 const getAllPostRouter = async (req,res) =>{
 
     if (!queryOk([req.query.boardid])){
-        res.status(400).send({errorCode:400,error:"no appropriate query request"});
+        const result = {errorCode:400,error:"no appropriate query request"}
+        console.log(result);
+        res.status(400).send(result);
     }else{
         const result = await postController.getAllPost(req.query.boardid);
         if (result.hasOwnProperty("error")){
+            console.log(result);
             res.status(400).send(result);
         }
         else res.status(200).send(result);
@@ -22,7 +25,9 @@ const getAllPostRouter = async (req,res) =>{
 // //get a specific post
 const getOnePostRouter = async (req,res) =>{
     if (!queryOk([req.query.postid,req.query.userid])){
-        res.status(400).send({errorCode:400,error:"no appropriate query request"});
+        const result = {errorCode:400,error:"no appropriate query request"}
+        console.log(result);
+        res.status(400).send(result);
     }else{
         const result = await postController.getOnePost(req.query.postid,req.query.userid);
         if (result.hasOwnProperty("error")){
@@ -39,7 +44,9 @@ const postWriteRouter = async (req,res) =>{
        const obj2 = delete obj1['second'];
        const obj2= (({ title, content,writer }) => ({ title, content,writer }))(obj1); */
     if (!queryOk([req.query.boardid,req.query.userid])){
-            res.status(400).send({errorCode:400,error:"no appropriate query request"});
+        const result = {errorCode:400,error:"no appropriate query request"}
+        console.log(result);
+        res.status(400).send(result);
     }else{
             // for (let i = 0 ; i<10 ; i++){
             //     const result = await postController.postWrite(`${i}${i}`,`${i}content`,req.query.userid);
@@ -54,6 +61,7 @@ const postWriteRouter = async (req,res) =>{
             const result = await postController.postWrite("secret2","contnset",req.query.boardid,req.query.userid);
 
             if (result.hasOwnProperty("error")){
+                console.log(result);
                 res.status(400).send(result);
             }else{
                 res.status(200).send(result);
@@ -66,10 +74,13 @@ const postWriteRouter = async (req,res) =>{
 const deleteOnePostRouter = async (req,res)=>{
     const postid = req.query.postid
     if (!queryOk([postid, req.query.userid])){
-        res.status(400).send({errorCode:400,error:"no appropriate query request"});
+        const result = {errorCode:400,error:"no appropriate query request"}
+        console.log(result);
+        res.status(400).send(result);
     }else{
         const result = await postController.deleteOnePost(postid,req.query.userid)
         if (result.hasOwnProperty("error")){
+            console.log(result);
             res.status(400).send(result);
         }else{
             res.status(200).send(result);
@@ -80,7 +91,9 @@ const deleteOnePostRouter = async (req,res)=>{
 
 const likePostRouter = async (req,res)=>{
     if (!queryOk([req.query.userid , req.query.postid])){
-        res.status(400).send({errorCode:400,error:"no appropriate query request"});
+        const result = {errorCode:400,error:"no appropriate query request"}
+        console.log(result);
+        res.status(400).send(result);
     }else{
         const result = await postController.likePost(req.query.postid,req.query.userid);
         if (result.hasOwnProperty("error")){

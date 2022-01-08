@@ -12,6 +12,7 @@ const getAllBoardRouter = async (req,res) =>{
 
     let result = await boardController.getAllBoard();
     if (result.hasOwnProperty("error")){
+        console.log(result);
         res.status(400).send(result);
     }
     res.status(200).send(result);
@@ -25,6 +26,7 @@ const boardWriteRouter = async (req,res) =>{
        const obj2 = delete obj1['second'];
        const obj2= (({ title, content,writer }) => ({ title, content,writer }))(obj1); */
     if (!queryOk([req.query.title,req.query.school])){
+            console.log(result);
             res.status(400).send({errorCode:400,error:"no appropriate query request"});
     }else{
             console.log("req.body",req.body,typeof req.body);
