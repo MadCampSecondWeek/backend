@@ -57,11 +57,6 @@ const boardWriteRouter = async (req,res) =>{
 // boardRouter.put('/post/edit/:postid', getEditPost);
 // boardRouter.post('/posrt/edit/:postid',postEditPost);
 
-boardRouter.use((req,res,next)=>{
-
-    console.log("hi")
-    next()
-})
 boardRouter.get('/',getAllBoardRouter); 
 boardRouter.post('/add',boardWriteRouter);
 

@@ -17,7 +17,7 @@ const likeCommentSchema = new mongoose.Schema({
     // author:{type:String, required: true},
     comment:{
         type : ObjectId,
-        ref : "comments",
+        // ref : "comments",
         required : true        
     },
 },
@@ -28,5 +28,5 @@ const likeCommentSchema = new mongoose.Schema({
 });
 
 
-const LikeComment = mongoose.model('likecomment',likePostSchema);
+const LikeComment = mongoose.model('likecomment',likeCommentSchema);
 module.exports = LikeComment

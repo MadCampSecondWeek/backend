@@ -4,7 +4,8 @@ const eventCommentRouter = express.Router();
 const Comments = require('../models/comment');
 const queryOk = require('../public/queryOk');
 
-const eventCommentController = require('../controllers/commentController');
+const eventCommentController = require('../controllers/eventCommentController');
+const commentController = require('../controllers/commentController');
 
 
 
@@ -12,22 +13,25 @@ const getAllEventCommentRouter = async(req,res) =>{
     if (!queryOk([req.query.eventid,req.query.apply])){
             const result = {errorCode:400,error:"no appropriate query request"}
             console.log(result);
-            res.status(400).send(result);
+            return res.status(400).send(result);
     }else{
-        const result = await eventCommentController.getALleventComment(req.query.eventid,req.query.apply);
+        const result = await eventCommentController.getAllEventComment(req.query.eventid,req.query.apply);
+        console.log("Resposne",result);
+        return res.status(200).send(result);
+        
     }
 };
 
 /* write submit */
 const eventCommentWriteRouter = async (req,res) =>{
         /* userid, postid */
-        const {eventid,userid,apply} =req.query
-        if (!queryOk([eventid,userid,apply])){
+        const {eventid,apply} =req.query
+        if (!queryOk([eventid,apply])){
             const result = {errorCode:400,error:"no appropriate query request"}
             console.log(result);
             res.status(400).send(result);
         }else{
-            const result = await commentController.eventCommentWrite(req.body.content,eventid,userid,apply);
+            const result = await eventCommentController.eventCommentWrite(req.body.content,eventid,req.user._id,apply);
             if (result.hasOwnProperty("error")){
                 res.status(400).send(result);
             }else{
@@ -41,13 +45,27 @@ const eventCommentWriteRouter = async (req,res) =>{
 
 // //delete a specific comment
 const deleteOneEventCommentRouter = async (req,res)=>{
-    const {commentid,userid} = req.query
-    if (!queryOk([commentid,userid])){
+    const {commentid} = req.query
+    if (!queryOk([commentid])){
         const result = {errorCode:400,error:"no appropriate query request"}
         console.log(result);
         res.status(400).send(result);
     }else{
-        const result = await commentController.deleteOneComment(commentid,userid)
+        const result = await eventCommentController.deleteOneComment(commentid,req.user._id);
+        if (result.hasOwnProperty("error")){
+            res.status(400).send(result);
+        }else{
+            res.status(200).send(result);
+        }
+    }
+}
+const likeEventCommentRouter = async (req,res)=>{
+    if (!queryOk( [req.query.eventcommentid])){
+        const result = {errorCode:400,error:"no appropriate query request"}
+        console.log(result);
+        res.status(400).send(result);
+    }else{
+        const result = await commentController.likeComment(req.query.eventcommentid,req.user._id);
         if (result.hasOwnProperty("error")){
             res.status(400).send(result);
         }else{
@@ -63,7 +81,7 @@ const deleteOneEventCommentRouter = async (req,res)=>{
 
 
 eventCommentRouter.get('/',getAllEventCommentRouter); 
-eventCommentRouter.get('/',eventCommentWriteRouter);
+eventCommentRouter.post('/',eventCommentWriteRouter);
 // postRouter.get('/post/:postid',getOnePostRouter);
 eventCommentRouter.delete('/',deleteOneEventCommentRouter);
 

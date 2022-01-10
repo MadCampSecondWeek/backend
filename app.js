@@ -8,7 +8,7 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const express = require('express');
-const socket = require('socket.io');
+const socketIO = require('socket.io');
 const passport = require('passport');
 require('dotenv').config
 
@@ -57,10 +57,7 @@ app.use(session({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
-app.use((req,res,next)=>{
-    console.log(req.headers.cookie);
-    next();
-});
+
 
 const PORT = process.env.PORT||80;
 
@@ -75,25 +72,31 @@ app.use('/board/comment',commentRouter);
 app.use('/eventboard',eventRouter);
 app.use('/eventboard/comment',eventCommentRouter);
 
-const server = http.createServer(app);
-const io = socket(server);
+const server = http.Server(app);//1
+const connectionOptions =  {
+    "force new connection" : true,
+    "reconnectionAttempts": "Infinity", 
+    "timeout" : 10000,                  
+    "transports" : ["websocket"],
+};
+// const io = socket(server,{transports :['websocket','polling,flashsocket'],
+//                             cors : {
+//                                 origin : server,
+//                                 credentials :true,
+//                             }});
+const io = socketIO(server);//1
 
-// const postController = require('./controllers/postController');
 
-server.listen(PORT,async()=>{
-    console.log(`app listening on port ${PORT}`)
-
-});
 
 
 const clients = []
 
-io.on('connect',(socket)=>{
-    clients.push(socket);
-    io.to(socket.id).emit("connect");
 
+io.on('connection',(socket)=>{
     console.log("User Connected",socket.id);
-    console.log("connection info ->"+socket.request.connectioon_peername);
+    console.log("connection info ->");
+    clients.push(socket);
+    io.to(socket.id).emit("abc");
     
 
     socket.on("join",(school)=>{
@@ -103,10 +106,51 @@ io.on('connect',(socket)=>{
     
     socket.on("send",(school,message)=>{
         console.log(message,`has sended from ${socket.id}`)
-        io.to(school).emit("getMessage",message);
+        io.to(school).emit("newMessage",message);
     });
+});
 
-    
+
+
+
+
+server.listen(PORT,()=>{
+    console.log(`app listening on port ${PORT}`)
 
 });
+
+// const express = require('express');
+// const socketIO = require('socket.io');
+// const http = require('http');
+// const morgan = require('morgan');
+// const PORT= 80
+
+// const app = express();
+// const server = http.Server(app);
+// const io = socketIO(http);
+// io.listen(server);
+
+// app.use(morgan('dev'));
+// io.on('connection',(socket)=>{
+//     console.log("connected");
+//     // console.log("User Connected",socket.id);
+//     // console.log("connection info ->");
+//     // clients.push(socket);
+//     // io.to(socket.id).emit("abc");
+    
+
+//     // socket.on("join",(school)=>{
+//     //     console.log(`want to join in ${school} room`);
+//     //     socket.join(school);
+//     // });
+    
+//     // socket.on("send",(school,message)=>{
+//     //     console.log(message,`has sended from ${socket.id}`)
+//     //     io.to(school).emit("newMessage",message);
+//     // });
+// });
+// // console.log(io)
+
+// server.listen(PORT, ()=>{console.log("pleaseplease")});
+
 

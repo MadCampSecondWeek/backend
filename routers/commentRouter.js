@@ -58,6 +58,22 @@ const deleteOneCommentRouter = async (req,res)=>{
     }
 }
 
+const likeCommentRouter = async (req,res)=>{
+    if (!queryOk( [req.query.commentid])){
+        const result = {errorCode:400,error:"no appropriate query request"}
+        console.log(result);
+        res.status(400).send(result);
+    }else{
+        const result = await commentController.likeComment(req.query.commentid,req.user._id);
+        if (result.hasOwnProperty("error")){
+            res.status(400).send(result);
+        }else{
+            res.status(200).send(result);
+        }
+    }
+}
+
+
 
 // // //editing page
 // // postRouter.put('/post/edit/:postid', getEditPost);
@@ -66,6 +82,8 @@ const deleteOneCommentRouter = async (req,res)=>{
 
 // postRouter.get('/',getAllPostRouter); 
 commentRouter.post('/',commentWriteRouter);
+commentRouter.get('/like',likeCommentRouter);
+
 // postRouter.get('/post/:postid',getOnePostRouter);
 commentRouter.delete('/',deleteOneCommentRouter);
 

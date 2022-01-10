@@ -30,21 +30,24 @@ Obj.LikePostFunc = function (postid, userid){
     this.post = ObjectId(postid);
     this.user= ObjectId(userid);
 }
+Obj.LikeCommentFunc = function (commentid, userid){
+    this.comment = ObjectId(postid);
+    this.user= ObjectId(userid);
+}
 
-Obj.Event = function(category,title,content,host,headCount,location,time,image,school){
+Obj.Event = function(category,title,content,host,headCount,location,time,school){
     this.category = category;
     this.title = title;
     this.content = content;
-    this.host = ObjecId(host);
+    this.host = ObjectId(host);
     this.headCount = headCount;
-    this.loaction = location;
+    this.location = location;
     this.time = time;
-    this.image = image;
     this.school = school;
 }
 
 Obj.EventComment = function(content,author,event,apply){
-    this.apply = apply;
+    this.apply = Number(apply);
     this.author = ObjectId(author);
     this.content = content;
     this.event = ObjectId(event);

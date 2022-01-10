@@ -1,6 +1,7 @@
 const Comments = require('../models/comment');
 const Posts = require('../models/post');
 const Users = require('../models/user');
+const LikeComment = require('../models/likeComment');
 
 const Obj = require('../prototype/Obj');
 const ObjectId = require('mongoose').Types.ObjectId;
@@ -35,13 +36,13 @@ const controller = {};
 
 /*after submit the writing content, add it to the db
  obj : {title,content,writer}*/ 
-controller.commentWrite = async (content,userId,postid) =>{
+controller.commentWrite = async (content,userId,commentid) =>{
     try{
         // let post = await Posts.findOne({"_id" : ObjectId(postid)});
         // const commentCount =post.commentCount + 1;]d
 
-        console.log(new Obj.Comment(content,userId,postid))
-        const comment = await Comments.create(new Obj.Comment(content,userId,postid));
+        console.log(new Obj.Comment(content,userId,commentid))
+        const comment = await Comments.create(new Obj.Comment(content,userId,commentid));
         
         const post = await Posts.findOneAndUpdate({"_id" : ObjectId(postid)},{$inc : {"commentCount":+1}},{new:true});
 
@@ -76,6 +77,32 @@ controller.deleteOneComment = async (commentId,userId) =>{
     }   
 }
 
+controller.likeComment = async (commentid,userid) => {
+    try{
+        // let comment = await Comments.findOne({"_id" : ObjectId(commentid)});
+        const isLiked = await LikeComment.findOne({$and: [{user:ObjectId(userid)},{comment:ObjectId(commentid)}]});
+        if (isLiked){
+            await LikeComment.findByIdAndDelete(isLiked);
+            const comment = await Comments.findOneAndUpdate({"_id" : ObjectId(commentid)},{ $inc :{"likeCount":  -1}},{new:true});
+            if (!comment){/// null
+                throw new Error("no corresponding comment id");
+            }
+            return JSON.stringify(comment);
+        }else{
+            await LikeComment.create(new Obj.LikeCommentFunc(commentid,userid))
+            const comment = await Comments.findOneAndUpdate({"_id" : ObjectId(commentid)},{ $inc :{"likeCount":  1}},{new:true});
+            if (!comment){///null
+                throw new Error("no corresponding comment id");
+            }
+            return JSON.stringify(comment);
+            
+        }
+        
+    }catch(error){
+        console.error(error);
+        return JSON.stringify({errorCode:400,error:error.message});
+    }
+};
 
 
 module.exports = controller

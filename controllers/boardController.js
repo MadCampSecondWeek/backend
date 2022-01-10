@@ -3,6 +3,7 @@ const Posts = require('../models/post');
 const Comments = require('../models/comment');
 const Boards = require('../models/board');
 const LikePost = require('../models/likePost');
+const Events = require('../models/event');
 const ObjectId = require('mongoose').Types.ObjectId;
 const Obj = require('../prototype/Obj');
 
@@ -33,7 +34,16 @@ boardController.getAllBoard = async (user) =>{
         /* Hot Posts for home */
         const hotBoard = await postController.getHotPosts(true,user);
         const todayPopularBoard = await postController.getTodayPopularPosts(true,user);
-        return JSON.stringify({boards,hotBoard,todayPopularBoard});
+       
+        /* Events for home */
+        // const events = await eventController.getAllEvent
+        const eventBoard = await Events.find()
+                                .select('title location content time headCount')
+                                .sort({'idx':-1}).limit(5).lean();
+        return JSON.stringify({boards,hotBoard,todayPopularBoard,eventBoard});
+
+        // return JSON.stringify(events)
+
         // return JSON.stringify(boards);
 
     }catch(error){

@@ -9,7 +9,7 @@ const Events= require('../models/event');
 
 const eventCommentSchema = new mongoose.Schema({
     apply : {
-        type: Boolean,
+        type: Number,
         required : true,
     },
     author:{

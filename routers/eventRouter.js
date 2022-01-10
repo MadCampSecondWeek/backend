@@ -22,30 +22,29 @@ const getAllEventRouter = async (req,res) =>{
 };
 
 const getScrappedEventsRouter = async (req,res) =>{
-    if (!queryOk([req.query.userid])){
-        const result = {errorCode:400,error:"no appropriate query request"}
-        console.log(result);
-        res.status(400).send(result);
-    }else{
-        const result = await eventController.getScrappedEvents(req.query.userid);
+    // if (!queryOk([req.query.userid])){
+    //     const result = {errorCode:400,error:"no appropriate query request"}
+    //     console.log(result);
+    //     res.status(400).send(result);
+    // }else{
+        const result = await eventController.getScrappedEvents(req.user._id);
         if (result.hasOwnProperty("error")){
             console.log(result);
             res.status(400).send(result);
         }else{
             res.status(200).send(result);
         }
-    }
+    
 };
 
 
 // //get a specific post
 const getOneEventRouter = async (req,res) =>{
-    if (!queryOk([req.query.eventid,req.query.userid])){
+    if (!queryOk([req.query.eventid])){
         const result = {errorCode:400,error:"no appropriate query request"}
-        console.log(result);
         res.status(400).send(result);
     }else{
-        const result = await postController.getOneEvent(req.query.postid,req.query.userid);
+        const result = await eventController.getOneEvent(req.query.eventid,req.user._id);
         if (result.hasOwnProperty("error")){
             res.status(400).send(result);
         }else{
@@ -59,21 +58,23 @@ const eventWriteRouter = async (req,res) =>{
 /*     const obj1= {first:1, second:2, third:3};
        const obj2 = delete obj1['second'];
        const obj2= (({ title, content,writer }) => ({ title, content,writer }))(obj1); */
-    if (!queryOk([req.query.category,req.query.userid])){
+       
+    if (!queryOk([req.query.category])){
         const result = {errorCode:400,error:"no appropriate query request"}
         console.log(result);
         res.status(400).send(result);
     }else{
-            const {title,content,headCount,location,time,image,school} = req.body;
+            const {title,content,headCount,location,time} = req.body;
             const result = 
-                await postController.postWrite(
+                await eventController.eventWrite(
                     req.query.category,
-                    title,content,
-                    req.query.userid,
-                    Number(headCount),
-                    location,time,
-                    Number(image),
-                    Number(school)
+                    title,
+                    content,
+                    req.user._id,
+                    headCount,
+                    location,
+                    time,
+                    Number(req.user.school)
                 );
 
             if (result.hasOwnProperty("error")){
@@ -88,12 +89,12 @@ const eventWriteRouter = async (req,res) =>{
 
 // //delete a specific post
 const deleteOneEventRouter = async (req,res)=>{
-    if (!queryOk([req.query.eventid, req.query.userid])){
+    if (!queryOk([req.query.eventid])){
         const result = {errorCode:400,error:"no appropriate query request"}
         console.log(result);
         res.status(400).send(result);
     }else{
-        const result = await eventController.deleteOneEvent(req.query.eventid,req.query.userid)
+        const result = await eventController.deleteOneEvent(req.query.eventid,req.user._id)
         if (result.hasOwnProperty("error")){
             console.log(result);
             res.status(400).send(result);
@@ -105,12 +106,12 @@ const deleteOneEventRouter = async (req,res)=>{
 }
 
 const scrapEventRouter = async (req,res)=>{
-    if (!queryOk([ req.query.eventid,req.query.userid ])){
+    if (!queryOk([ req.query.eventid])){
         const result = {errorCode:400,error:"no appropriate query request"}
         console.log(result);
         res.status(400).send(result);
     }else{
-        const result = await eventController.scrapEvent(req.query.eventid,req.query.userid);
+        const result = await eventController.scrapEvent(req.query.eventid,req.user._id);
         if (result.hasOwnProperty("error")){
             res.status(400).send(result);
         }else{
@@ -118,6 +119,13 @@ const scrapEventRouter = async (req,res)=>{
         }
     }
 }
+
+
+eventRouter.use((req,res,next)=>{
+
+    console.log("hi")
+    next()
+})
 
 
 eventRouter.get('/',getAllEventRouter); 

@@ -12,8 +12,8 @@ const eventCommentController = {};
 eventCommentController.getAllEventComment = async (eventid,apply) =>{
     try {
         // const evnt = await Events.findOne({_id:ObjectId(eventid)})
-        const comments = await EventComments.find({$and : [{_id : ObjectId(eventid)},{apply:apply}]},'author content event').sort('createdAt');
-        return JSON.stringfy(comments);
+        const comments = await EventComments.find({$and : [{_id : ObjectId(eventid)},{apply:apply}]},'author content event').sort('idx');
+        return JSON.stringify(comments);
     }catch(error){
         console.error(error);
         return JSON.stringify({errorCode:400,error:error.message});
@@ -27,8 +27,8 @@ eventCommentController.getAllEventComment = async (eventid,apply) =>{
 eventCommentController.eventCommentWrite = async (content,eventid,userid,apply) =>{
     try{
         
-        const event = await Posts.findOneAndUpdate({"_id" : ObjectId(eventid)},{$inc : {"commentCount":+1}},{new:true});
-        const comment = await EventComments.create(new Obj.EventComment(content,userId,eventid,apply));
+        const event = await Events.findOneAndUpdate({"_id" : ObjectId(eventid)},{$inc : {"commentCount":+1}},{new:true});
+        const comment = await EventComments.create(new Obj.EventComment(content,userid,eventid,apply));
 
         return JSON.stringify(comment);
     }catch(error){
@@ -41,12 +41,12 @@ eventCommentController.eventCommentWrite = async (content,eventid,userid,apply) 
 eventCommentController.deleteOneEventComment = async (eventcommentid,userid) =>{
     try{
         let eventComment = await EventComments.findOne({"_id" : ObjectId(eventcommentid)});
-        if (ObjectId(userid).equals(comment.author)){
+        if (ObjectId(userid).equals(eventComment.author)){
             // const commentCount = comment.post.commentCount -1;
             // post = await Posts.findOneAndUpdate({"_id" : comment.post._id},{"commentCount":commentCount},{new:true});
             const event = await Posts.findOneAndUpdate({"_id" : eventComment.event},{$inc : {"commentCount":-1}},{new:true});
-            comment = await Comments.deleteOne({"_id" : ObjectId(eventcommentId)});
-            return JSON.stringify(comment);
+            eventcomment = await Comments.deleteOne({"_id" : ObjectId(eventcommentId)});
+            return JSON.stringify(eventcomment);
         }else{
             console.log("you can not remove the post");
             return JSON.stringify({errorCode:403,error:"forbbiden"});

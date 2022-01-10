@@ -53,10 +53,6 @@ const eventSchema = new mongoose.Schema({
         type : String,
         required : true,
     },
-    image :{
-        type : Number,
-        required : true,
-    },
     school :{
         type : Number,
         required:true,

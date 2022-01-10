@@ -11,8 +11,14 @@ eventController={};
 // get all of the post from the board.
 eventController.getAllEvent = async (category) =>{
     try {
-        const eventss = await Events.find({category:category}).sort({'idx':-1}).limit().lean();
-        return JSON.stringify(events)
+        if (Number(category)===0){
+            const events = await Events.find({}).sort({'idx':-1}).limit().lean();
+            return JSON.stringify(events)
+        }else{
+            const events = await Events.find({category:category}).sort({'idx':-1}).limit().lean();
+            return JSON.stringify(events)
+        }
+        
     }catch(error){
         console.error(error);
         return JSON.stringify({errorCode:400,error:error.message});
@@ -54,11 +60,13 @@ eventController.getScrappedEvents = async (userid) => {
 
 eventController.getOneEvent = async (eventid,userid) =>{
     try{
-        
+
+
         const event = await Events.findOne({_id : ObjectId(eventid)});
-        // const comments = await EventComments.find({$and : [{_id : ObjectId(eventid)},{apply:apply}]},'author content event');
-        
-        let isScrapped = await ScrapEvent.findOne({$and: [{user:ObjectId(userid)},{event:ObjectId(eventid)}]});
+
+
+
+        let isScrapped = await ScrapEvent.findOne({$and: [{user:userid},{event:ObjectId(eventid)}]});
         if (isScrapped){
             isScrapped = true;
         }else{
@@ -68,10 +76,8 @@ eventController.getOneEvent = async (eventid,userid) =>{
 
         // return JSON.stringify({event,comments,isScrapped});
         return JSON.stringify({event,isScrapped});
-
         // const post = await Posts.find({"_id" : ObjectId(id)});
         // return JSON.stringify(post);
-
         
     }catch(error){
         console.error(error);
@@ -82,9 +88,9 @@ eventController.getOneEvent = async (eventid,userid) =>{
 
 /*after submit the writing content, add it to the db
  obj : {title,content,author}*/ 
-eventController.eventWrite = async (category,title,content,userid,headCount,location,time,image,school) =>{
+eventController.eventWrite = async (category,title,content,userid,headCount,location,time,school) =>{
     try{
-        const newEvent = new Obj.Event(category,title,content,userid,headCount,location,time,image,school);
+        const newEvent = new Obj.Event(category,title,content,userid,headCount,location,time,school);
         const event = await Events.create(newEvent);
         return JSON.stringify(event);
     }catch(error){

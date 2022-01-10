@@ -31,10 +31,12 @@ postController.getHotPosts = async (forHome,user) => {
             const posts = await Posts.find({$and : [{school:user.school},{likeCount : {"$gte":10}}]})
                 .select("title content board likeCount commentCount createdAt")
                 .sort({'idx':-1})
-                .limit(10).lean().populate({path:'board',select:'title school'});
+                .limit(5).lean().populate({path:'board',select:'title school'});
             return JSON.stringify(posts);
         }else{
-            const posts = await Posts.find({$and: [{school:user.school},{likeCount : {"$gte":10}}]}).sort({'idx':-1}).limit().lean().populate({path:'board',select:'title'});
+            const posts = await Posts.find({$and: [{school:user.school},{likeCount : {"$gte":10}}]})
+            .sort({'idx':-1})
+            .limit().lean().populate({path:'board',select:'title'});
             return JSON.stringify(posts);
         }
     }catch(error){
@@ -52,14 +54,15 @@ postController.getTodayPopularPosts = async (forHome,user) => {
                 }}]})
                 .select("title content board likeCount commentCount createdAt")
                 .sort({'likeCount':-1})
-                .limit(10).lean().populate({path:'board',select:'title'});
+                .limit(3).lean().populate({path:'board',select:'title'});
             return JSON.stringify(posts)
         }else{
             const posts = await Posts.find({$and : [{school:user.school},
                 {createdAt: {
                   $gte: today.toDate(),
                   $lte: moment(today).endOf('day').toDate()
-                }}]}).sort({'likeCount':-1}).limit().lean().populate({path:'board',select:'title'});
+                }}]})
+                .sort({'likeCount':-1}).limit().lean().populate({path:'board',select:'title'});
             return JSON.stringify(posts)
         }
 
@@ -72,7 +75,7 @@ postController.getTodayPopularPosts = async (forHome,user) => {
 
 postController.getOnePost = async (postid,userid) =>{
     try{
-        
+        console.log("postid",postid);
         const post = await Posts.findOne({_id : ObjectId(postid)}).populate({path:'author',select:'idx'});
         const comments = await Comments.find({post:ObjectId(postid)}).sort('createdAt').populate({path:'author',select:'idx'});
         

@@ -33,11 +33,8 @@ const getAllPostRouter = async (req,res) =>{
     }
 };
 const getHotPostsRouter = async (req,res) =>{
-    let forHome = false;
-    if (req.query.home){
-        forHome=true;
-    }
-    const result = await postController.getHotPosts(forHome,req.user);
+    
+    const result = await postController.getHotPosts(false,req.user);
     if (result.hasOwnProperty("error")){
         console.log(result);
         res.status(400).send(result);
@@ -47,11 +44,8 @@ const getHotPostsRouter = async (req,res) =>{
 };
 
 const getTodayPopularPostsRouter = async (req,res) =>{
-    let forHome = false;
-    if (req.query.home){
-        forHome=true;
-    }
-    const result = await postController.getTodayPopularPosts(forHome,req.user);
+    
+    const result = await postController.getTodayPopularPosts(false,req.user);
     if (result.hasOwnProperty("error")){
         console.log(result);
         res.status(400).send(result);
