@@ -35,13 +35,16 @@ const controller = {};
 
 /*after submit the writing content, add it to the db
  obj : {title,content,writer}*/ 
-controller.commentWrite = async (userId,postid) =>{
+controller.commentWrite = async (content,userId,postid) =>{
     try{
         // let post = await Posts.findOne({"_id" : ObjectId(postid)});
-        // const commentCount =post.commentCount + 1;]
-        console.log("123");
+        // const commentCount =post.commentCount + 1;]d
+
+        console.log(new Obj.Comment(content,userId,postid))
+        const comment = await Comments.create(new Obj.Comment(content,userId,postid));
+        
         const post = await Posts.findOneAndUpdate({"_id" : ObjectId(postid)},{$inc : {"commentCount":+1}},{new:true});
-        const comment = await Comments.create(new Obj.Comment("this is content",userId,postid));
+
 
         return JSON.stringify(comment);
     }catch(error){

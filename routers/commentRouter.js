@@ -21,12 +21,14 @@ const commentWriteRouter = async (req,res) =>{
 //         console.log(`hi${i}`);
 //     }
         /* userid, postid */
-        if (!queryOk([req.query.userid,req.query.postid])){
+        console.log(req.body);
+        if (!queryOk([req.query.postid])){
             const result = {errorCode:400,error:"no appropriate query request"}
             console.log(result);
             res.status(400).send(result);
         }else{
-            const result = await commentController.commentWrite(req.query.userid,req.query.postid);
+            
+            const result = await commentController.commentWrite(req.body.content,req.user._id,req.query.postid);
 
             if (result.hasOwnProperty("error")){
                 res.status(400).send(result);
@@ -42,12 +44,12 @@ const commentWriteRouter = async (req,res) =>{
 // //delete a specific comment
 const deleteOneCommentRouter = async (req,res)=>{
     const commentid = req.query.commentid
-    if (!queryOk([commentid,req.query.userid])){
+    if (!queryOk([commentid])){
         const result = {errorCode:400,error:"no appropriate query request"}
         console.log(result);
         res.status(400).send(result);
     }else{
-        const result = await commentController.deleteOneComment(commentid,req.query.userid)
+        const result = await commentController.deleteOneComment(commentid,req.user._id)
         if (result.hasOwnProperty("error")){
             res.status(400).send(result);
         }else{
@@ -63,7 +65,7 @@ const deleteOneCommentRouter = async (req,res)=>{
 
 
 // postRouter.get('/',getAllPostRouter); 
-commentRouter.get('/',commentWriteRouter);
+commentRouter.post('/',commentWriteRouter);
 // postRouter.get('/post/:postid',getOnePostRouter);
 commentRouter.delete('/',deleteOneCommentRouter);
 

@@ -11,6 +11,14 @@ const userSchema = new mongoose.Schema({
         unique:true,
         default:0,
     },
+    email:{
+        type:String,
+        required:true
+    },
+    password:{
+        type:String,
+        required:true,
+    },
     school :{
         type:Number,
         required:true,

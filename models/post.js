@@ -21,6 +21,10 @@ const postSchema = new mongoose.Schema({
         type : String,
         required : true,
     },
+    school :{
+        type :  Number,
+        required : true,
+    },
     // author:{
     //     type:String,
     //     required:true,

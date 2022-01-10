@@ -4,14 +4,15 @@ const Comments = require('../models/comment');
 const LikePost = require('../models/likePost');
 const ObjectId = require('mongoose').Types.ObjectId;
 const Obj = require('../prototype/Obj');
+const moment = require('moment');
+const today = moment().startOf('day');
 
-const postController = {};
 
-
+postController={};
 // get all of the post from the board.
 postController.getAllPost = async (boardid) =>{
     try {
-        const posts = await Posts.find({board:ObjectId(boardid)}).limit().lean();
+        const posts = await Posts.find({board:ObjectId(boardid)}).sort({'idx':-1}).limit().lean();
         return JSON.stringify(posts)
         // res.status(200).send(JSON.stringify(posts));
         // console.log(JSON.parse(JSON.stringify([{_id : "1a2b4c5v",title:"안뇽",content:"배고파",likeCount : 999999, commnentCount :0 },
@@ -22,6 +23,52 @@ postController.getAllPost = async (boardid) =>{
         return JSON.stringify({errorCode:400,error:error.message});
     }
 };
+
+postController.getHotPosts = async (forHome,user) => {
+    try{
+        
+        if (forHome){
+            const posts = await Posts.find({$and : [{school:user.school},{likeCount : {"$gte":10}}]})
+                .select("title content board likeCount commentCount createdAt")
+                .sort({'idx':-1})
+                .limit(10).lean().populate({path:'board',select:'title school'});
+            return JSON.stringify(posts);
+        }else{
+            const posts = await Posts.find({$and: [{school:user.school},{likeCount : {"$gte":10}}]}).sort({'idx':-1}).limit().lean().populate({path:'board',select:'title'});
+            return JSON.stringify(posts);
+        }
+    }catch(error){
+        console.error(error);
+        return JSON.stringify({errorCode:400,error:error.message});
+    }
+}
+postController.getTodayPopularPosts = async (forHome,user) => {
+    try{
+        if (forHome){
+            const posts = await Posts.find({$and : [{school:user.school},
+                {createdAt: {
+                  $gte: today.toDate(),
+                  $lte: moment(today).endOf('day').toDate()
+                }}]})
+                .select("title content board likeCount commentCount createdAt")
+                .sort({'likeCount':-1})
+                .limit(10).lean().populate({path:'board',select:'title'});
+            return JSON.stringify(posts)
+        }else{
+            const posts = await Posts.find({$and : [{school:user.school},
+                {createdAt: {
+                  $gte: today.toDate(),
+                  $lte: moment(today).endOf('day').toDate()
+                }}]}).sort({'likeCount':-1}).limit().lean().populate({path:'board',select:'title'});
+            return JSON.stringify(posts)
+        }
+
+        
+    }catch(error){
+        console.error(error);
+        return JSON.stringify({errorCode:400,error:error.message});
+    }
+}
 
 postController.getOnePost = async (postid,userid) =>{
     try{
@@ -52,10 +99,10 @@ postController.getOnePost = async (postid,userid) =>{
 
 /*after submit the writing content, add it to the db
  obj : {title,content,author}*/ 
-postController.postWrite = async (title,content,boardid,userid) =>{
+postController.postWrite = async (title,content,boardid,userid,school) =>{
     try{
 
-        const newpost = new Obj.Post(title,content,boardid,userid);
+        const newpost = new Obj.Post(title,content,boardid,userid,school);
         const post = await Posts.create(newpost);
         
         return JSON.stringify(post);
@@ -71,6 +118,7 @@ postController.deleteOnePost = async (postId,userId) =>{
     try{
         let post = await Posts.findOne({"_id" : ObjectId(postId)});
         // console.log(userId,post.author,typeof userId, typeof post.author);
+
         if (ObjectId(userId).equals(post.author)){
             post = await Posts.deleteOne({"_id" : ObjectId(postId)});
             const comments = await Comments.deleteMany({post:ObjectId(postId)});

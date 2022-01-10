@@ -6,13 +6,20 @@ const LikePost = require('../models/likePost');
 const ObjectId = require('mongoose').Types.ObjectId;
 const Obj = require('../prototype/Obj');
 
+const postController = require('./postController');
+// const eventController = require("./eventController");
+
 const boardController = {};
 
 
-// get all of the post from the board.
-boardController.getAllBoard = async () =>{
+/* get all of the post from the board.
+   + Hot Posts / today-popular Posts */
+boardController.getAllBoard = async (user) =>{
     try {
-        const boards = await Boards.find({}).limit().lean();
+        // getAllBoard
+        const boards = await Boards.find({school:user.school}).limit(20).lean();
+
+        // const boards = await Boards.find({}).limit(20).lean();
         for (let board of boards){
             let recentPost = await Posts.find({board:board}).sort({idx:-1}).limit(1).lean();
             recentPost = recentPost[0];
@@ -22,7 +29,13 @@ boardController.getAllBoard = async () =>{
             }else{ title = recentPost.title;}
             board.recentPost = title
         }
-        return JSON.stringify(boards);
+
+        /* Hot Posts for home */
+        const hotBoard = await postController.getHotPosts(true,user);
+        const todayPopularBoard = await postController.getTodayPopularPosts(true,user);
+        return JSON.stringify({boards,hotBoard,todayPopularBoard});
+        // return JSON.stringify(boards);
+
     }catch(error){
         console.error(error);
         return JSON.stringify({errorCode:400,error:error.message});

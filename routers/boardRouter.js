@@ -1,6 +1,6 @@
 /* This is the router code for the url under /board/~ */
 const express = require('express');
-const postRouter = express.Router();
+const boardRouter = express.Router();
 const Posts = require('../models/post');
 const Boards = require('../models/board');
 const postController = require('../controllers/postController');
@@ -10,43 +10,33 @@ const queryOk = require('../public/queryOk');
 /* Get all posts */
 const getAllBoardRouter = async (req,res) =>{
 
-    let result = await boardController.getAllBoard();
+    let result = await boardController.getAllBoard(req.user);
     if (result.hasOwnProperty("error")){
         console.log(result);
-        res.status(400).send(result);
+        return res.status(400).send(result);
     }
-    res.status(200).send(result);
+    return res.status(200).send(result);
 };
 
 
 
 /* write submit */
 const boardWriteRouter = async (req,res) =>{
-/*     const obj1= {first:1, second:2, third:3};
-       const obj2 = delete obj1['second'];
-       const obj2= (({ title, content,writer }) => ({ title, content,writer }))(obj1); */
-    if (!queryOk([req.query.title,req.query.school])){
-            console.log(result);
-            res.status(400).send({errorCode:400,error:"no appropriate query request"});
-    }else{
-            console.log("req.body",req.body,typeof req.body);
 
-            const result = await boardController.boardWrite(req.query.title,req.query.school);
-            
+    const result = await boardController.boardWrite(req.body.title,req.user.school);       
             
             // const result = await boardController.postWrite("title","contnset",req.query.userid);
-
-            if (result.hasOwnProperty("error")){
-                res.status(400).send(result);
-            }else{
-                res.status(200).send(result);
-            }
+    if (result.hasOwnProperty("error")){
+        res.status(400).send(result);
+    }else{
+        res.status(200).send(result);
     }
+    
 }
 
 
 // //delete a specific post
-// const deleteOnePostRouter = async (req,res)=>{
+// const deleteOneboardRouter = async (req,res)=>{
 //     const postid = req.query.postid
 //     if (!queryOk([postid, req.query.userid])){
 //         res.status(400).send({errorCode:400,error:"no appropriate query request"});
@@ -64,14 +54,18 @@ const boardWriteRouter = async (req,res) =>{
 
 
 // //editing page
-// postRouter.put('/post/edit/:postid', getEditPost);
-// postRouter.post('/posrt/edit/:postid',postEditPost);
+// boardRouter.put('/post/edit/:postid', getEditPost);
+// boardRouter.post('/posrt/edit/:postid',postEditPost);
 
+boardRouter.use((req,res,next)=>{
 
-postRouter.get('/',getAllBoardRouter); 
-postRouter.get('/add',boardWriteRouter);
+    console.log("hi")
+    next()
+})
+boardRouter.get('/',getAllBoardRouter); 
+boardRouter.post('/add',boardWriteRouter);
 
-// postRouter.delete('/post',deleteOnePostRouter);
+// boardRouter.delete('/post',deleteOneboardRouter);
 
-module.exports= postRouter;
+module.exports= boardRouter;
 

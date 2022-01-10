@@ -28,7 +28,7 @@ const getAllUserRouter = async (req,res) =>{
 /* write submit */
 const userWriteRouter = async (req,res) =>{
 
-    let i=12
+    let i=17
 
     const result = await userController.userWrite(i);
 

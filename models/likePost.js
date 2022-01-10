@@ -22,7 +22,7 @@ const likePostSchema = new mongoose.Schema({
     },
 },
     {
-        timestamps:true,
+
         versionKey: false,
         collection:'likepost'
 });

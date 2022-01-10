@@ -9,9 +9,6 @@ router.get('/',function(req,res){
 
    console.dir(obj1);
    console.dir(obj2);
-
-
-
    
    res.send('Welcome!!!!');
 });
