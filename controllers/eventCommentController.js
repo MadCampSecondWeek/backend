@@ -22,6 +22,18 @@ eventCommentController.getAllEventComment = async (eventid,userid,apply) =>{
                 }else{
                     isLiked = false;
                 }
+
+                /* NOTE : urgent fetch temporarily
+                createdAt to korean time
+                The logic needs to be modified that it should be have a korean time form when the post (and comment) is created
+                */
+                let createdAt = item.createdAt
+                createdAt=new Date(createdAt);
+                createdAt.setHours(createdAt.getHours()+9);
+                item.createdAt = createdAt.toLocaleString('ko-KR');
+
+
+
                 //empty array -> false
                 if (!commentAuthors.some(e=> {
                     

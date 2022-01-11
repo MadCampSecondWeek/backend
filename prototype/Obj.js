@@ -53,6 +53,17 @@ Obj.EventComment = function(content,author,event,apply){
     this.event = ObjectId(event);
 }
 
+Obj.EventForm = function(content,host,contact,headCount,school,event,author){
+    this.content = content
+    this.host = ObjectId(host);
+    this.contact = contact;
+    this.headCount = headCount;
+    this.school = school;
+    this.event = ObjectId(event);
+    this.author = author;
+}
+
+
 Obj.ScrapEventFunc = function(eventid,userid){
     this.event = eventid;
     this.user = userid;

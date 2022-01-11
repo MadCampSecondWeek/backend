@@ -28,8 +28,10 @@ const userRouter = require('./routers/userRouter');
 const commentRouter = require('./routers/commentRouter');
 const boardRouter = require('./routers/boardRouter');
 const eventRouter = require('./routers/eventRouter');
+const eventFormRouter = require('./routers/eventFormRouter');
 const eventCommentRouter = require('./routers/eventCommentRouter');
 const authRouter = require('./routers/auth');
+
 
 const app = express();
 passportConfig();
@@ -69,8 +71,10 @@ app.use('/',boardRouter);
 app.use('/board',postRouter);
 app.use('/user',userRouter);
 app.use('/board/comment',commentRouter);
-app.use('/eventboard',eventRouter);
+app.use('/eventboard/apply',eventFormRouter);
 app.use('/eventboard/comment',eventCommentRouter);
+app.use('/eventboard',eventRouter);
+
 
 const server = http.Server(app);//1
 const connectionOptions =  {
@@ -107,7 +111,7 @@ io.on('connection',(socket)=>{
     socket.on("send",(data)=>{
         console.log(data.message,`has sended from ${socket.id}`)
         console.log(data.school.toString());
-        io.to(data.school.toString()).emit("getMessage",data.message);
+        socket.broadcast.to(data.school.toString()).emit("getMessage",data.message);
     });
 
     socket.on("disconnect",()=>{

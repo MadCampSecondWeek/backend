@@ -39,23 +39,22 @@ const userWriteRouter = async (req,res) =>{
 }
 
 
-// //delete a specific post
-// const deleteOnePostRouter = async (req,res)=>{
-//     const postId = req.params.postId
-//     console.log("id",postId)
-//     const result = await postController.deleteOnePost(postId)
-//     if (result.hasOwnProperty("error")){
-//         res.status(400).send(result);
-//     }
-//     res.status(200).send(result);
-// }
+const setSchoolRouter = async (req,res)=>{
+    const school = req.body.school;
+    const result = await Users.updateOneById(user._id,{$set:{school}});
+    return res.status(200).send(result);
+}
+
+
+
+module.exports = userRouter;
 
 
 // //editing page
 // postRouter.put('/post/edit/:postId', getEditPost);
 // postRouter.post('/posrt/edit/:postId',postEditPost);
 
-
+userRouter.post('/school',setSchoolRouter);
 userRouter.get('/',getAllUserRouter); 
 userRouter.get('/add',userWriteRouter);
 // postRouter.get('/post/:postId',getOnePostRouter);

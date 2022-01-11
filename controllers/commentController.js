@@ -21,21 +21,11 @@ const controller = {};
 //     }
 // };
 
-// controller.getOnePost = async (id) =>{
-//     try{
-//         const post = await Posts.find({"_id" : ObjectId(id)});
-//         return JSON.stringify(post);
-
-        
-//     }catch(error){
-//         console.error(error);
-//         return JSON.stringify({errorCode:400,error:error.message});
-//     }   
-// }
 
 
-/*after submit the writing content, add it to the db
- obj : {title,content,writer}*/ 
+
+
+
 controller.commentWrite = async (content,userId,commentid) =>{
     try{
         // let post = await Posts.findOne({"_id" : ObjectId(postid)});

@@ -32,6 +32,21 @@ const getAllPostRouter = async (req,res) =>{
         else res.status(200).send(result);
     }
 };
+
+const getMyPostsRouter = async (req,res) =>{
+    
+    const result = await postController.getMyPosts(req.user);
+    if (result.hasOwnProperty("error")){
+        console.log(result);
+        res.status(400).send(result);
+    }else{
+        res.status(200).send(result);
+    } 
+};
+
+
+
+
 const getHotPostsRouter = async (req,res) =>{
     
     const result = await postController.getHotPosts(false,req.user);
@@ -86,7 +101,6 @@ const postWriteRouter = async (req,res) =>{
             // }
             // i = 1
             // const result = await postController.postWrite(`${i}${i}`,`${i}content`,req.query.userid);
-
             // const result = await postController.postWrite(req.body.title,req.body.content,req.query.userid);
             
             const {title,content} = req.body;
@@ -148,6 +162,7 @@ postRouter.post('/post',postWriteRouter);
 postRouter.get('/post',getOnePostRouter);
 postRouter.delete('/post',deleteOnePostRouter);
 postRouter.get('/post/like',likePostRouter);
+postRouter.get('/my',getMyPostsRouter);
 postRouter.get('/hot',getHotPostsRouter);
 postRouter.get('/today-popular',getTodayPopularPostsRouter);
 module.exports= postRouter;

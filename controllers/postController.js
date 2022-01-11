@@ -14,7 +14,21 @@ postController={};
 // get all of the post from the board.
 postController.getAllPost = async (boardid) =>{
     try {
-        const posts = await Posts.find({board:ObjectId(boardid)}).sort({'idx':-1}).limit().lean();
+        let posts = await Posts.find({board:ObjectId(boardid)}).sort({'idx':-1}).limit().lean();
+        console.log(posts);
+        posts = await Promise.all(posts.map( async (item) =>{
+            let createdAt = item.createdAt
+            createdAt=new Date(createdAt);
+            createdAt.setHours(createdAt.getHours()+9);
+            item.createdAt = createdAt.toLocaleString('ko-KR');
+            return item;
+            /*NOTE : urgent fetch temporarily
+                createdAt to korean time
+                The logic needs to be modified that it should be have a korean time form when the post (and comment) is created
+            */
+           
+        }));
+        console.log(posts);
         return JSON.stringify(posts)
         // res.status(200).send(JSON.stringify(posts));
         // console.log(JSON.parse(JSON.stringify([{_id : "1a2b4c5v",title:"안뇽",content:"배고파",likeCount : 999999, commnentCount :0 },
@@ -27,20 +41,36 @@ postController.getAllPost = async (boardid) =>{
 };
 postController.getMyPosts = async (user) => {
     try{
-        const posts = await Posts.find({$and: [{school:user.school},{likeCount : {"$gte":10}}]})
-        .sort({'idx':-1})
-        .limit().lean().populate({path:'board',select:'title'});
+        const posts = await Posts.find({author:user})
+            .sort({'idx':-1})
+            .limit().lean().populate({path:'board',select:'title'});
         return JSON.stringify(posts);
     }catch(error){
         console.error(error);
         return JSON.stringify({errorCode:400,error:error.message});
     }
-
 };
+
+postController.getMyCommentPosts = async (user) => {
+    try{
+        const comments = await Posts.find({author:user});
+        const posts = await Posts.find({author:user})
+            .sort({'idx':-1})
+            .limit().lean().populate({path:'board',select:'title'});
+        return JSON.stringify(posts);
+    }catch(error){
+        console.error(error);
+        return JSON.stringify({errorCode:400,error:error.message});
+    }
+};
+
+
+
+
+
 
 postController.getHotPosts = async (forHome,user) => {
     try{
-        
         if (forHome){
             const posts = await Posts.find({$and : [{school:user.school},{likeCount : {"$gte":10}}]})
                 .select("title content board likeCount commentCount createdAt")
@@ -94,41 +124,46 @@ postController.getOnePost = async (postid,userid) =>{
         console.log("postid",postid);
         const post = await Posts.findOne({_id : ObjectId(postid)}).populate({path:'author',select:'idx'});
         post._doc.isAuthor = ObjectId(userid).equals(post.author._id);
-
+        createdAt = post._doc.createdAt
+        createdAt=new Date((new Date(createdAt)));
+        createdAt.setHours(createdAt.getHours()+9);
+        post._doc.createdAt = createdAt.toLocaleString('ko-KR');
 
         let comments = await Comments.find({post:ObjectId(postid)}).sort({'createdAt':1}).populate({path:'author',select:'idx'});
-        
         
         
         const commentAuthors =[];
         comments = await Promise.all(comments.map( async (item) =>{
             let isLiked = await LikeComment.findOne({$and: [{user:ObjectId(userid)},{comment:ObjectId(item._id)}]});
+            if (isLiked){
+                isLiked = true;
+            }else{
+                isLiked = false;
+            }
+            
+            // Add is Author   
+            item._doc.isAuthor = ObjectId(userid).equals(item.author._id);
 
-                
-                item._doc.isAuthor = ObjectId(userid).equals(item.author._id);
+            // refine date format
 
-                //empty array -> false
-                if (!commentAuthors.some(e=> {
-                    
-                    // console.log(e.author._id,item.author.id);
-                    // console.log(e.author._id.equals(item.author._id));
-                    if (e.author._id.equals(item.author._id)){
-                        item._doc.displayNumber = e._doc.displayNumber
-                        return true;
-                    }
-                })){
-                    console.log(commentAuthors);
-                    commentAuthors.push(item);
-                    item._doc.displayNumber = commentAuthors.length
+            // console.log(timezoneOffset);
+            createdAt = item._doc.createdAt
+            createdAt=new Date((new Date(createdAt)));
+            createdAt.setHours(createdAt.getHours()+9);
+            item._doc.createdAt = createdAt.toLocaleString('ko-KR');
+
+
+            //empty array -> false
+            if (!commentAuthors.some(e=> {
+                if (e.author._id.equals(item.author._id)){
+                    item._doc.displayNumber = e._doc.displayNumber
+                    return true;
                 }
-
-
-
-                if (isLiked){
-                    isLiked = true;
-                }else{
-                    isLiked = false;
-                }
+            })){
+                commentAuthors.push(item);
+                item._doc.displayNumber = commentAuthors.length
+            }
+            
             return {comment : item,isLiked}
             })
         );

@@ -78,7 +78,7 @@ const eventWriteRouter = async (req,res) =>{
                     headCount,
                     location,
                     time,
-                    Number(req.user.school)
+                    req.user.school
                 );
 
             if (result.hasOwnProperty("error")){

@@ -1,5 +1,6 @@
 const Events = require('../models/event');
 const EventComments = require('../models/eventComment');
+const EventForms = require('../models/eventForm');
 const ScrapEvent = require('../models/scrapEvent');
 const ObjectId = require('mongoose').Types.ObjectId;
 const Obj = require('../prototype/Obj');
@@ -72,13 +73,18 @@ eventController.getOneEvent = async (eventid,userid) =>{
         }else{
             isScrapped = false;
         }
-        /* Comment({content,author,post}) */
-
-        // return JSON.stringify({event,comments,isScrapped});
-
-
         event._doc.isScrapped= isScrapped;
-        // event["isScrapped"] = isScrapped;
+        
+        // For check if already applied to this event.
+        
+        let isApplied = await EventForms.findOne({$and :[{author:userid},{event:ObjectId(eventid)}]});
+        if (isApplied){
+            isApplied = true;
+        }else{
+            isApplied = false;
+        }
+        event._doc.isApplied= isApplied;
+
 
         return JSON.stringify(event);
         // const post = await Posts.find({"_id" : ObjectId(id)});
@@ -115,6 +121,7 @@ eventController.deleteOneEvent = async (eventId,userId) =>{
             event = await Events.deleteOne({"_id" : ObjectId(eventId)});
             const eventcomments = await EventComments.deleteMany({event:ObjectId(eventId)});
             const scrapEvent = await ScrapEvent.deleteMany({event:ObjectId(eventId)});
+            const evnentForms = await EventForms.deleteMany({event:ObjectId(eventid)});
             return JSON.stringify({event,eventcomments,scrapEvent});
         }else{
             console.log("you can not remove the post");
