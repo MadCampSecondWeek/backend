@@ -13,7 +13,7 @@
 #  Stack
 ###  (Backend) Node.js, Express framework, MongoDB
 ### (Frontend) React-Native
-# Main  : 익명 커뮤니티 서비스
+# 익명 커뮤니티 서비스
 
 ### 로그인 / 회원가입
 회원가입 시 유저의 이메일, 비밀번호, 학교정보를 받아와 회원 정보를 db에 저장한다. 패스워드는 bcrypt 암호화를 통해 db에 안전하게 저장된다.
