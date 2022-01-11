@@ -44,7 +44,7 @@ controller.commentWrite = async (content,userId,commentid) =>{
         console.log(new Obj.Comment(content,userId,commentid))
         const comment = await Comments.create(new Obj.Comment(content,userId,commentid));
         
-        const post = await Posts.findOneAndUpdate({"_id" : ObjectId(postid)},{$inc : {"commentCount":+1}},{new:true});
+        const post = await Posts.findOneAndUpdate({"_id" : comment.post},{$inc : {"commentCount":+1}},{new:true});
 
 
         return JSON.stringify(comment);
@@ -64,6 +64,7 @@ controller.deleteOneComment = async (commentId,userId) =>{
             post = await Posts.findOneAndUpdate({"_id" : comment.post._id},{"commentCount":commentCount},{new:true});
             // console.log("this is post", post);
             comment = await Comments.deleteOne({"_id" : ObjectId(commentId)});
+            await LikeComment.deleteMany({comment:ObjectId(commentId)});
             return JSON.stringify(comment);
 
         }else{

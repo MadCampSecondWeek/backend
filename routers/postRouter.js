@@ -64,6 +64,7 @@ const getOnePostRouter = async (req,res) =>{
         if (result.hasOwnProperty("error")){
             res.status(400).send(result);
         }else{
+            console.log(result);
             res.status(200).send(result);
         }
     }
@@ -90,7 +91,7 @@ const postWriteRouter = async (req,res) =>{
             
             const {title,content} = req.body;
             const school = req.user.school;
-            const result = await postController.postWrite(title,content,req.query.boardid,req.user._id,Number(school));
+            const result = await postController.postWrite(title,content,req.query.boardid,req.user._id,school);
 
             if (result.hasOwnProperty("error")){
                 console.log(result);

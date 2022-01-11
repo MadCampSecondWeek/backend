@@ -28,6 +28,11 @@ const eventCommentSchema = new mongoose.Schema({
         ref : "events",
         required : true        
     },
+    likeCount :{
+        type : Number,
+        required: true,
+        default : 0.
+    },
 },
     {
         timestamps:true,

@@ -20,9 +20,8 @@ const userSchema = new mongoose.Schema({
         required:true,
     },
     school :{
-        type:Number,
+        type:String,
         required:true,
-        
     },
 
 },

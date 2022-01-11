@@ -18,6 +18,7 @@ const boardController = {};
 boardController.getAllBoard = async (user) =>{
     try {
         // getAllBoard
+        console.log(user.school);
         const boards = await Boards.find({school:user.school}).limit(20).lean();
 
         // const boards = await Boards.find({}).limit(20).lean();
@@ -29,6 +30,18 @@ boardController.getAllBoard = async (user) =>{
                 title = "작성된 글이 없습니다."
             }else{ title = recentPost.title;}
             board.recentPost = title
+        }
+
+        if (boards.length==0){
+            const newboards =[];
+            newboards.push(new Obj.Board("자유게시판",user.school));
+            newboards.push(new Obj.Board("질문게시판",user.school));
+            newboards.push(new Obj.Board("홍보게시판",user.school));
+            newboards.push(new Obj.Board("정보게시판",user.school));
+            newboards.push(new Obj.Board("동아리게시판",user.school));
+            for (let newboard of newboards){
+                await Boards.create(newboard);
+            }
         }
 
         /* Hot Posts for home */
@@ -57,7 +70,7 @@ boardController.getAllBoard = async (user) =>{
 /* add board for devleoper */
 boardController.boardWrite = async (title,school) =>{
     try{
-        const newboard = new Obj.Board(title,Number(school));
+        const newboard = new Obj.Board(title,school);
         
         const board = await Boards.create(newboard);
         

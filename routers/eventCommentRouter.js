@@ -15,8 +15,8 @@ const getAllEventCommentRouter = async(req,res) =>{
             console.log(result);
             return res.status(400).send(result);
     }else{
-        const result = await eventCommentController.getAllEventComment(req.query.eventid,req.query.apply);
-        console.log("Resposne",result);
+        const result = await eventCommentController.getAllEventComment(req.query.eventid,req.user._id,req.query.apply);
+        console.log(result);
         return res.status(200).send(result);
         
     }
@@ -28,7 +28,7 @@ const eventCommentWriteRouter = async (req,res) =>{
         const {eventid,apply} =req.query
         if (!queryOk([eventid,apply])){
             const result = {errorCode:400,error:"no appropriate query request"}
-            console.log(result);
+
             res.status(400).send(result);
         }else{
             const result = await eventCommentController.eventCommentWrite(req.body.content,eventid,req.user._id,apply);
@@ -51,7 +51,7 @@ const deleteOneEventCommentRouter = async (req,res)=>{
         console.log(result);
         res.status(400).send(result);
     }else{
-        const result = await eventCommentController.deleteOneComment(commentid,req.user._id);
+        const result = await eventCommentController.deleteOneEventComment(commentid,req.user._id);
         if (result.hasOwnProperty("error")){
             res.status(400).send(result);
         }else{
@@ -60,12 +60,12 @@ const deleteOneEventCommentRouter = async (req,res)=>{
     }
 }
 const likeEventCommentRouter = async (req,res)=>{
-    if (!queryOk( [req.query.eventcommentid])){
+    if (!queryOk( [req.query.commentid])){
         const result = {errorCode:400,error:"no appropriate query request"}
         console.log(result);
         res.status(400).send(result);
     }else{
-        const result = await commentController.likeComment(req.query.eventcommentid,req.user._id);
+        const result = await eventCommentController.likeComment(req.query.commentid,req.user._id);
         if (result.hasOwnProperty("error")){
             res.status(400).send(result);
         }else{
@@ -82,6 +82,7 @@ const likeEventCommentRouter = async (req,res)=>{
 
 eventCommentRouter.get('/',getAllEventCommentRouter); 
 eventCommentRouter.post('/',eventCommentWriteRouter);
+eventCommentRouter.get('/like',likeEventCommentRouter);
 // postRouter.get('/post/:postid',getOnePostRouter);
 eventCommentRouter.delete('/',deleteOneEventCommentRouter);
 

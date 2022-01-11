@@ -48,7 +48,7 @@ router.post('/login',isNotLoggedIn,async(req,res,next)=>{
     })(req,res,next);
 });
 
-router.post('logout',isLoggedIn, async (req,res)=>{
+router.post('/logout',isLoggedIn, async (req,res)=>{
     req.logout();
     req.session.destroy();
 

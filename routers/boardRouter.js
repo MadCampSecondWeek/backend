@@ -9,7 +9,8 @@ const queryOk = require('../public/queryOk');
 
 /* Get all posts */
 const getAllBoardRouter = async (req,res) =>{
-
+    console.log(req.user);
+    console.log(req.header);
     let result = await boardController.getAllBoard(req.user);
     if (result.hasOwnProperty("error")){
         console.log(result);

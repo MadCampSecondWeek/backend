@@ -31,7 +31,7 @@ Obj.LikePostFunc = function (postid, userid){
     this.user= ObjectId(userid);
 }
 Obj.LikeCommentFunc = function (commentid, userid){
-    this.comment = ObjectId(postid);
+    this.comment = ObjectId(commentid);
     this.user= ObjectId(userid);
 }
 
@@ -53,9 +53,9 @@ Obj.EventComment = function(content,author,event,apply){
     this.event = ObjectId(event);
 }
 
-Obj.ScrapEventFunc = function(scrapid,userid){
-    this.scrapid = scrapid;
-    this.userid = userid;
+Obj.ScrapEventFunc = function(eventid,userid){
+    this.event = eventid;
+    this.user = userid;
 }
 
 Obj.ALL = 0
@@ -65,6 +65,5 @@ Obj.GAME = 3
 Obj.DATE = 4
 Obj.TRAVEL = 5
 Obj.STUDY = 6
-Obj.HOBBY = 7
 
 module.exports = Obj

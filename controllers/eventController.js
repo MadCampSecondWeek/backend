@@ -64,7 +64,7 @@ eventController.getOneEvent = async (eventid,userid) =>{
 
         const event = await Events.findOne({_id : ObjectId(eventid)});
 
-
+        event._doc.isAuthor = ObjectId(userid).equals(event.host);
 
         let isScrapped = await ScrapEvent.findOne({$and: [{user:userid},{event:ObjectId(eventid)}]});
         if (isScrapped){
@@ -75,7 +75,12 @@ eventController.getOneEvent = async (eventid,userid) =>{
         /* Comment({content,author,post}) */
 
         // return JSON.stringify({event,comments,isScrapped});
-        return JSON.stringify({event,isScrapped});
+
+
+        event._doc.isScrapped= isScrapped;
+        // event["isScrapped"] = isScrapped;
+
+        return JSON.stringify(event);
         // const post = await Posts.find({"_id" : ObjectId(id)});
         // return JSON.stringify(post);
         
@@ -105,11 +110,12 @@ eventController.deleteOneEvent = async (eventId,userId) =>{
     try{
         let event = await Events.findOne({"_id" : ObjectId(eventId)});
         // console.log(userId,post.author,typeof userId, typeof post.author);
-        if (ObjectId(userId).equals(event.author)){
+        console.log(userId,event.host);
+        if (ObjectId(userId).equals(event.host)){
             event = await Events.deleteOne({"_id" : ObjectId(eventId)});
             const eventcomments = await EventComments.deleteMany({event:ObjectId(eventId)});
-            const scrapevent = await scrapevent.deleteMany({event:ObjectId(eventId)});
-            return JSON.stringify({event,eventcomments,scrapevent});
+            const scrapEvent = await ScrapEvent.deleteMany({event:ObjectId(eventId)});
+            return JSON.stringify({event,eventcomments,scrapEvent});
         }else{
             console.log("you can not remove the post");
             return JSON.stringify({errorCode:403,error:"forbbiden"});

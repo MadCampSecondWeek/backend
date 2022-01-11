@@ -11,7 +11,7 @@ const scrapEventSchema = new mongoose.Schema({
         required : true        
     },
     user:{
-        type : mongoose.Types.ObjectId,
+        type : ObjectId,
         ref:"users",
         required : true
     },

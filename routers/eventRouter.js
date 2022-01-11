@@ -17,7 +17,10 @@ const getAllEventRouter = async (req,res) =>{
             console.log(result);
             res.status(400).send(result);
         }
-        else res.status(200).send(result);
+        else {
+            console.log(result);
+            res.status(200).send(result);
+        }
     }
 };
 
@@ -48,6 +51,7 @@ const getOneEventRouter = async (req,res) =>{
         if (result.hasOwnProperty("error")){
             res.status(400).send(result);
         }else{
+            console.log(result);
             res.status(200).send(result);
         }
     }

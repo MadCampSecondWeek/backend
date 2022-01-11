@@ -92,22 +92,28 @@ const io = socketIO(server);//1
 const clients = []
 
 
-io.on('connection',(socket)=>{
-    console.log("User Connected",socket.id);
-    console.log("connection info ->");
-    clients.push(socket);
-    io.to(socket.id).emit("abc");
-    
 
-    socket.on("join",(school)=>{
-        console.log(`want to join in ${school} room`);
-        socket.join(school);
-    });
+
+
+io.on('connection',(socket)=>{
+    console.log(`${socket.id} connected`);
+    // clients.push(socket);
     
-    socket.on("send",(school,message)=>{
-        console.log(message,`has sended from ${socket.id}`)
-        io.to(school).emit("newMessage",message);
+    socket.on("join",(school)=>{
+        console.log(`${socket.id} join into the ${school} room`);
+        socket.join(school.toString());
     });
+
+    socket.on("send",(data)=>{
+        console.log(data.message,`has sended from ${socket.id}`)
+        console.log(data.school.toString());
+        io.to(data.school.toString()).emit("getMessage",data.message);
+    });
+
+    socket.on("disconnect",()=>{
+        console.log(`${socket.id} disconnected`);
+        socket.disconnect();
+    })
 });
 
 

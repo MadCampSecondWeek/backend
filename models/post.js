@@ -22,7 +22,7 @@ const postSchema = new mongoose.Schema({
         required : true,
     },
     school :{
-        type :  Number,
+        type :  String,
         required : true,
     },
     // author:{

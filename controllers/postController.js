@@ -2,10 +2,12 @@ const { db } = require('../models/post');
 const Posts = require('../models/post');
 const Comments = require('../models/comment');
 const LikePost = require('../models/likePost');
+const LikeComment =require('../models/likeComment');
 const ObjectId = require('mongoose').Types.ObjectId;
 const Obj = require('../prototype/Obj');
 const moment = require('moment');
 const today = moment().startOf('day');
+const { text } = require('body-parser');
 
 
 postController={};
@@ -23,6 +25,18 @@ postController.getAllPost = async (boardid) =>{
         return JSON.stringify({errorCode:400,error:error.message});
     }
 };
+postController.getMyPosts = async (user) => {
+    try{
+        const posts = await Posts.find({$and: [{school:user.school},{likeCount : {"$gte":10}}]})
+        .sort({'idx':-1})
+        .limit().lean().populate({path:'board',select:'title'});
+        return JSON.stringify(posts);
+    }catch(error){
+        console.error(error);
+        return JSON.stringify({errorCode:400,error:error.message});
+    }
+
+};
 
 postController.getHotPosts = async (forHome,user) => {
     try{
@@ -31,7 +45,7 @@ postController.getHotPosts = async (forHome,user) => {
             const posts = await Posts.find({$and : [{school:user.school},{likeCount : {"$gte":10}}]})
                 .select("title content board likeCount commentCount createdAt")
                 .sort({'idx':-1})
-                .limit(5).lean().populate({path:'board',select:'title school'});
+                .limit(4).lean().populate({path:'board',select:'title school'});
             return JSON.stringify(posts);
         }else{
             const posts = await Posts.find({$and: [{school:user.school},{likeCount : {"$gte":10}}]})
@@ -43,7 +57,9 @@ postController.getHotPosts = async (forHome,user) => {
         console.error(error);
         return JSON.stringify({errorCode:400,error:error.message});
     }
-}
+};
+
+
 postController.getTodayPopularPosts = async (forHome,user) => {
     try{
         if (forHome){
@@ -54,7 +70,7 @@ postController.getTodayPopularPosts = async (forHome,user) => {
                 }}]})
                 .select("title content board likeCount commentCount createdAt")
                 .sort({'likeCount':-1})
-                .limit(3).lean().populate({path:'board',select:'title'});
+                .limit(2).lean().populate({path:'board',select:'title'});
             return JSON.stringify(posts)
         }else{
             const posts = await Posts.find({$and : [{school:user.school},
@@ -77,8 +93,48 @@ postController.getOnePost = async (postid,userid) =>{
     try{
         console.log("postid",postid);
         const post = await Posts.findOne({_id : ObjectId(postid)}).populate({path:'author',select:'idx'});
-        const comments = await Comments.find({post:ObjectId(postid)}).sort('createdAt').populate({path:'author',select:'idx'});
+        post._doc.isAuthor = ObjectId(userid).equals(post.author._id);
+
+
+        let comments = await Comments.find({post:ObjectId(postid)}).sort({'createdAt':1}).populate({path:'author',select:'idx'});
         
+        
+        
+        const commentAuthors =[];
+        comments = await Promise.all(comments.map( async (item) =>{
+            let isLiked = await LikeComment.findOne({$and: [{user:ObjectId(userid)},{comment:ObjectId(item._id)}]});
+
+                
+                item._doc.isAuthor = ObjectId(userid).equals(item.author._id);
+
+                //empty array -> false
+                if (!commentAuthors.some(e=> {
+                    
+                    // console.log(e.author._id,item.author.id);
+                    // console.log(e.author._id.equals(item.author._id));
+                    if (e.author._id.equals(item.author._id)){
+                        item._doc.displayNumber = e._doc.displayNumber
+                        return true;
+                    }
+                })){
+                    console.log(commentAuthors);
+                    commentAuthors.push(item);
+                    item._doc.displayNumber = commentAuthors.length
+                }
+
+
+
+                if (isLiked){
+                    isLiked = true;
+                }else{
+                    isLiked = false;
+                }
+            return {comment : item,isLiked}
+            })
+        );
+
+
+
         let isLiked = await LikePost.findOne({$and: [{user:ObjectId(userid)},{post:ObjectId(postid)}]});
         if (isLiked){
             isLiked = true;
@@ -131,8 +187,6 @@ postController.deleteOnePost = async (postId,userId) =>{
             console.log("you can not remove the post");
             return JSON.stringify({errorCode:403,error:"forbbiden"});
         }
-
-        
     }catch(error){
         console.error(error);
         return JSON.stringify({errorCode:400,error:error.message});

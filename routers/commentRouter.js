@@ -29,7 +29,7 @@ const commentWriteRouter = async (req,res) =>{
         }else{
             
             const result = await commentController.commentWrite(req.body.content,req.user._id,req.query.postid);
-
+            
             if (result.hasOwnProperty("error")){
                 res.status(400).send(result);
             }else{

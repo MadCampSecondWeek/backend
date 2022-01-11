@@ -15,7 +15,7 @@ const boardSchema = new mongoose.Schema({
         trim : true,
     },
     school:{
-        type: Number,
+        type: String,
         required : true
     },
     idx : {
